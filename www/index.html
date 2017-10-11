@@ -39,12 +39,25 @@
 
 			});
 $.material.init()
+
+  $('#test').click(function () {
+    if(!localStorage.testing) {
+      localStorage.testing = 1;
+    } else {
+      localStorage.testing++;
+    }
+
+    $('#feedback').text('Total: ' + localStorage.testing)
+
+  });
+
 });
 </script>
 </head>
 <body>
 <input type="text" id="time" class="form-control floating-label" placeholder="Time">
-
+<button id="test">Increase</button>
+<div id="feedback"></div>
 
 </body>
 </html>
