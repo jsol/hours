@@ -1,0 +1,19 @@
+<widget xmlns   = "http://www.w3.org/ns/widgets"
+    xmlns:gap   = "http://phonegap.com/ns/1.0"
+    id          = "com.jsol.hours"
+    versionCode = "10"
+    version     = "1.0.0" >
+
+<!-- versionCode is optional and Android only -->
+
+  <name>Hours</name>
+
+  <description>
+      Reporting working hours tppö
+  </description>
+
+  <author href="https://build.phonegap.com" email="jens@rootsy.nu">
+      Jens Olsson
+  </author>
+
+</widget>
