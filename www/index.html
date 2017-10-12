@@ -23,22 +23,21 @@
 
   <script type="text/javascript" src="js/bootstrap-material-datetimepicker.js"></script>
 <script>
-		$(document).ready(function()
+  $(document).ready(function() {
 
-		{
+  $('#time').bootstrapMaterialDatePicker({
+    nowButton: true,
+    date: false,
+    shortTime: false,
+    format: 'HH:mm'
+  }).on('change', ev => {
+    console.log('Change!!')
+    $.post('http://localhost:5000/v1/jenson/time', { type: 'start', timestamp: Date.now() }, res => {
+      console.log(res)
+    }, 'json')
+  })
 
-			$('#time').bootstrapMaterialDatePicker
-
-			({
-
-				date: false,
-
-				shortTime: false,
-
-				format: 'HH:mm'
-
-			});
-$.material.init()
+  $.material.init()
 
   $('#test').click(function () {
     if(!localStorage.testing) {
@@ -48,7 +47,6 @@ $.material.init()
     }
 
     $('#feedback').text('Total: ' + localStorage.testing)
-
   });
 
 });
