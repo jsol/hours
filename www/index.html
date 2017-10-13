@@ -23,38 +23,54 @@
 
   <script type="text/javascript" src="js/bootstrap-material-datetimepicker.js"></script>
 <script>
+  function pad(val) {
+    return `0${val}`.slice(-2)
+  }
+
   $(document).ready(function() {
+  const d = new Date();
+
+  $('#date').val(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`)
+  $('#date').bootstrapMaterialDatePicker({ weekStart : 1, time: false });
 
   $('#time').bootstrapMaterialDatePicker({
     nowButton: true,
     date: false,
     shortTime: false,
     format: 'HH:mm'
-  }).on('change', ev => {
-    console.log('Change!!')
-    $.post('http://localhost:5000/v1/jenson/time', { type: 'start', timestamp: Date.now() }, res => {
-      console.log(res)
-    }, 'json')
   })
 
   $.material.init()
 
-  $('#test').click(function () {
-    if(!localStorage.testing) {
-      localStorage.testing = 1;
-    } else {
-      localStorage.testing++;
+  $('#save').click(function () {
+    const saveDate = new Date($('#date').val() + 'T' + $('#time').val() + ':00')
+    const newTime = {
+      timestamp: +saveDate,
+      shorttime: $('#time').val(),
+      year: saveDate.getFullYear(),
+      month: saveDate.getMonth() + 1,
+      day: saveDate.getDate()
     }
 
-    $('#feedback').text('Total: ' + localStorage.testing)
+    $.ajax({
+      type: 'POST',
+      url: 'http://localhost:5500/v1/time',
+      data: JSON.stringify(newTime),
+      contentType: 'application/json',
+      dataType: 'json',
+      success: res => {
+        console.log(res)
+      }
+    })
   });
 
 });
 </script>
 </head>
 <body>
+<input type="text" id="date" class="form-control floating-label" placeholder="Date">
 <input type="text" id="time" class="form-control floating-label" placeholder="Time">
-<button id="test">Increase</button>
+<button id="save">Save</button>
 <div id="feedback"></div>
 
 </body>
