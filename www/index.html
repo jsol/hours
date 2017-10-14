@@ -1,21 +1,12 @@
 <html>
 <head>
 <title>Hours report tool</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css" />
   <link rel="stylesheet" href="css/bootstrap-material-design.min.css"/>
-  <link rel="stylesheet" href="css/ripples.min.css"/>
   <link rel="stylesheet" href="css/bootstrap-material-datetimepicker.css" />
-
-  <link href='http://fonts.googleapis.com/css?family=Roboto:400,500' rel='stylesheet' type='text/css'>
 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-
   <script src="js/jquery-1.12.3.min.js"></script>
-
-  <script type="text/javascript" src="js/bootstrap.min.js"></script>
-
-  <script src="js/ripples.min.js"></script>
 
   <script src="js/material.min.js"></script>
 
@@ -33,6 +24,7 @@
   $('#date').val(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`)
   $('#date').bootstrapMaterialDatePicker({ weekStart : 1, time: false });
 
+  $('#time').val(`${pad(d.getHours())}:${pad(d.getMinutes())}`)
   $('#time').bootstrapMaterialDatePicker({
     nowButton: true,
     date: false,
@@ -68,10 +60,17 @@
 </script>
 </head>
 <body>
-<input type="text" id="date" class="form-control floating-label" placeholder="Date">
-<input type="text" id="time" class="form-control floating-label" placeholder="Time">
+<center>
+<div>
+<input type="text" id="date"  placeholder="Date">
+</div>
+<div>
+<input type="text" id="time"  placeholder="Time">
+</div>
+<div>
 <button id="save">Save</button>
+</div>
 <div id="feedback"></div>
-
+</center>
 </body>
 </html>

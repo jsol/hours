@@ -16,7 +16,7 @@ CREATE table IF NOT EXISTS `users` (
   `userid` varchar(256) NOT NULL,
   `timezone` bigint(20) NOT NULL,
   `password` varchar(256) NOT NULL,
-   PRIMARY KEY (`userid`),
+   PRIMARY KEY (`userid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE table IF NOT EXISTS `table_revisions` (
@@ -29,6 +29,6 @@ CREATE table IF NOT EXISTS `table_revisions` (
 INSERT INTO `table_revisions` (
           `tablename`,       `appversion`
 ) VALUES ('times',       '1.0.0'),
-         ('users', '1.0.0')
+         ('users', '1.0.0'),
          ('table_revisions', '1.0.0')
   ON DUPLICATE KEY UPDATE `appversion` = '1.0.0';

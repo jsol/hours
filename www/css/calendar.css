@@ -1,0 +1,48 @@
+#content {
+  display: table;
+  position: relative;
+  border: 1px solid black;
+}
+#current {
+  display: table;
+margin: 0 auto;
+margin-bottom: 10px;
+}
+
+#previous {
+  text-align: left;
+position: absolute;
+left: 0px;
+top: 0px;
+}
+
+#next {
+position: absolute;
+right: 0px;
+top: 0px;
+}
+
+#calendar {
+  display: table;
+margin: 0 auto;
+margin-bottom: 10px;
+}
+
+.week {
+  vertical-align: top;
+}
+
+.day {
+  min-width: 100px;
+}
+
+.number {
+  text-align: right;
+  width: 100%;
+}
+
+.flex {
+  font-weight: bold;
+
+body {
+}
