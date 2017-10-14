@@ -4,6 +4,7 @@ const cors = require('cors')
 const mysql = require('mysql')
 const timeRouter = require('./timerouter')
 const path = require('path')
+const auth = require('./auth')
 
 const app = express()
 
@@ -27,17 +28,18 @@ app.use(nocache)
 app.use(bodyparser.json())
 app.use('/v1/time', timeRouter(dbPool))
 
-app.post('/v1/login', (req, res) => {
 
-})
-
-app.get('/v1/:user', (req, res) => {
-
+app.get('/v1/:user', auth, (req, res) => {
+  console.log(req.user)
+  res.end()
 })
 
 app.post('/v1/:user', (req, res) => {
 
 })
+
+app.post('/v1/temptoken', auth.shortToken)
+app.post('/v1/authenticate', (req, res) => auth.longToken(db, req, res))
 
 app.use('/', express.static(path.join(__dirname, '../www')));
 

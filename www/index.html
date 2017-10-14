@@ -18,6 +18,30 @@
     return `0${val}`.slice(-2)
   }
 
+  function checkPreviousDays(data) {
+    console.log(data)
+    const warnings = []
+    const now = new Date()
+    Object.keys(data).forEach(day => {
+      if(data[day].length % 2 && day < now.getDate()) {
+        warnings.push(`${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(day)} lacks stoptime`)
+      }
+    })
+    console.log(warnings)
+    $('#feedback').html(warnings.join('<br>'))
+  }
+
+  function fetchCurrentMonth() {
+    const month = new Date()
+    $.ajax({
+      type: 'GET',
+      url: `http://localhost:5500/v1/time/month/${month.getFullYear()}-${pad(month.getMonth() + 1)}`,
+      dataType: 'json',
+      success: checkPreviousDays
+    })
+
+  }
+
   $(document).ready(function() {
   const d = new Date();
 
@@ -54,6 +78,7 @@
         console.log(res)
       }
     })
+    fetchCurrentMonth();
   });
 
 });
