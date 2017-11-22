@@ -1,40 +1,51 @@
-const uuid = require('uuid/v4')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const argon2i = require('argon2-ffi').argon2i
 
 const jwtsecret = process.env.jwtsecret || 'dev'
 
-function checkCredentials(db, user, password, callback) {
+function checkCredentials (db, user, password, callback) {
   db.query('SELECT password FROM users WHERE userid = ? LIMIT 1', [user], (err, result) => {
     if (err) {
       console.log(err)
-      return callback(false)
+      return callback(err)
     }
 
-    if (!result) {
-      return callback(false)
+    if (!result.length) {
+      console.log(result)
+      return callback(new Error('No such user'))
     }
 
-    argon2i.verify(result[0].password, password, function (err) {
-      if (err) {
-        console.log(err)
-        return callback(false)
+    argon2i.verify(result[0].password, password).then(correct => {
+      if (!correct) {
+        return callback(err)
       }
-      return callback(true)
+      return callback()
     })
   })
 }
 
-function setPassword(db, userid, password, callback) {
-
+function setPassword (db, userid, password, callback) {
+  crypto.randomBytes(32, (err, salt) => {
+    if (err) {
+      return callback(err)
+    }
+    argon2i.hash(password, salt)
+      .then((pwd) => {
+        db.query('UPDATE users SET password = ? WHERE userid = ?', [pwd, userid], (err2, result) => {
+          if (err2) {
+            return callback(err2)
+          }
+          return callback()
+        })
+      })
+  })
 }
-
 
 function auth (req, res, next) {
   console.log(req.headers.authorization)
 
-  if (!req.headers.authorization.match(/^Bearer /)) {
+  if (!req.headers.authorization || !req.headers.authorization.match(/^Bearer /)) {
     res.status(400).end()
     return
   }
@@ -60,59 +71,23 @@ function auth (req, res, next) {
 
 function longToken (db, req, res) {
   console.log(req.body)
-  checkCredentials(db, req.body.userid, req.body.password, res => {
-    if (res) {
-      const payload = {
-        userid: req.body.userid,
-        tokenid: uuid()
-      }
-
-      const token = jwt.sign(payload, jwtsecret)
-      res.json({
-        longtermtoken: token
-      }).end()
-      return
-    }
-    setTimeout(() => res.status(400).end(), 500)
-  })
-})
-
-function shortToken(req, res) {
-  console.log(req.headers.authorization)
-
-  if (!req.headers.authorization.match(/^Bearer /)) {
-    res.status(400).end()
-    return
-  }
-
-  const token = req.headers.authorization.substr(7)
-
-  jwt.verify(token, jwtsecret, (err, decoded) => {
+  checkCredentials(db, req.body.userid, req.body.password, err => {
     if (err) {
-      console.log(err)
-      res.status(400).end()
-      return
+      return setTimeout(() => res.status(400).end(), 500)
     }
-
-    console.log('by', decoded)
-
     const payload = {
-      userid: decoded.userid
+      userid: req.body.userid
     }
 
-    const tmptoken = jwt.sign(payload, jwtsecret, {
-      expiresIn: '30 minutes'
-    })
-
+    const token = jwt.sign(payload, jwtsecret)
     res.json({
-      tmptoken: tmptoken
+      token: token
     }).end()
   })
-})
+}
 
 module.exports = {
-  shortToken: shortToken,
-  longToken: longToken,
+  authenticate: longToken,
   auth: auth,
   setPassword: setPassword
 }

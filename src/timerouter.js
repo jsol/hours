@@ -10,14 +10,14 @@ module.exports = db => {
         if (!entry[key]) {
           const err = new Error(`${key} is not set`)
           err.statusCode = 400
-          throw err;
+          throw err
         }
       })
     }
 
     const t = {
       uuid: uuid(),
-      userid: 'jenson',
+      userid: req.user,
       timestamp: req.body.timestamp,
       shorttime: req.body.shorttime,
       year: req.body.year,
@@ -36,15 +36,14 @@ module.exports = db => {
 
         res.json(t).end()
       })
-
-    } catch(err) {
-          console.log(err)
+    } catch (err) {
+      console.log(err)
       res.status(err.statusCode || 500).end()
     }
   })
 
   time.delete('/:id', (req, res) => {
-    db.query('DELETE FROM `times` WHERE userid = ? AND uuid = ? LIMIT 1', ['jenson', req.params.id], (error, result) => {
+    db.query('DELETE FROM `times` WHERE userid = ? AND uuid = ? LIMIT 1', [req.user, req.params.id], (error, result) => {
       if (error) {
         console.log(error)
         return res.status(500).end()
@@ -67,33 +66,33 @@ module.exports = db => {
 
   time.get('/day/:day', (req, res) => {
     if (!req.params.day.match(/^2[0-9]{3}-[0|1][0-9]-[0-9]{2}$/)) {
-      return res.status(400).end();
+      return res.status(400).end()
     }
     const parts = req.params.day.split('-')
     if (parts[1] > 12 || parts[1] < 1) {
-      return res.status(400).end();
+      return res.status(400).end()
     }
-    const query = [ ...parts, 'jenson' ]
+    const query = [ ...parts, req.user ]
 
     db.query('SELECT `uuid`, `shorttime`, `timestamp`, `year`, `month`, `day` FROM `times` WHERE `year` = ? AND `month` = ? AND `day` = ? AND userid = ? ORDER BY `timestamp`', query, (error, result) => {
       if (error) {
         console.log(error)
         return res.status(500).end()
       }
-      res.json(result).end();
+      res.json(result).end()
     })
   })
 
   time.get('/month/:month', (req, res) => {
     if (!req.params.month.match(/^2[0-9]{3}-[0|1][0-9]$/)) {
-      return res.status(400).end();
+      return res.status(400).end()
     }
 
     const parts = req.params.month.split('-')
     if (parts[1] > 12 || parts[1] < 1) {
       return res.status(400).end()
     }
-    const query = [ ...parts, 'jenson' ]
+    const query = [ ...parts, req.user ]
 
     db.query('SELECT `uuid`, `shorttime`, `timestamp`, `year`, `month`, `day` FROM `times` WHERE `year` = ? AND `month` = ? AND userid = ? ORDER BY `timestamp`', query, (error, result) => {
       if (error) {
@@ -110,5 +109,5 @@ module.exports = db => {
       res.json(out).end()
     })
   })
-  return time;
-};
+  return time
+}

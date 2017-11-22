@@ -10,11 +10,39 @@ const daynames = ['Sun', 'Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
 const monthnames = ['January', 'February', 'Mars', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 const workingHours = 8
 
+function initSession(setup) {
+  const token = localStorage.getItem('authtoken')
+  if (token) {
+    return setup()
+  }
+
+  $('#login').show()
+  $('#loginButton').click(() => {
+    $.ajax({
+      type: 'POST',
+      url: '/v1/authenticate',
+      data: JSON.stringify({
+        userid: $('#username').val(),
+        password: $('#password').val()
+      }),
+      contentType: 'application/json',
+      dataType: 'json',
+      success: res => {
+        console.log(res)
+        localStorage.setItem('authtoken', res.token)
+        initSession(setup)
+
+      }
+    })
+  })
+}
+
 function initCalendar() {
   for (let i = 1; i < 8; i++) {
     $('#header').append(`<th>${daynames[i]}</th>`)
   }
 }
+
 function pad(val) {
   return `0${val}`.slice(-2)
 }
@@ -28,7 +56,10 @@ function renderEditFrame(day, month, data) {
     const $t = $('<div>').text(time.shorttime).append($('<button>').text('Delete').click(() => {
       $.ajax({
         type: 'DELETE',
-        url: `http://localhost:5500/v1/time/${time.uuid}`,
+        url: `/v1/time/${time.uuid}`,
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+        },
         dataType: 'json',
         success: () => {
           editDay(day, month)
@@ -58,9 +89,12 @@ function renderEditFrame(day, month, data) {
 
     $.ajax({
       type: 'POST',
-      url: 'http://localhost:5500/v1/time',
+      url: '/v1/time',
       data: JSON.stringify(newTime),
       contentType: 'application/json',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+      },
       dataType: 'json',
       success: res => {
         editDay(day, month)
@@ -92,7 +126,10 @@ function renderEditFrame(day, month, data) {
 function editDay(day, month) {
   $.ajax({
     type: 'GET',
-    url: `http://localhost:5500/v1/time/day/${month.getFullYear()}-${pad(month.getMonth() + 1)}-${pad(day)}`,
+    url: `/v1/time/day/${month.getFullYear()}-${pad(month.getMonth() + 1)}-${pad(day)}`,
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+    },
     dataType: 'json',
     success: data => {
       renderEditFrame(day, month, data)
@@ -154,7 +191,10 @@ function renderMonth(data) {
 function fetchMonth(month) {
   $.ajax({
     type: 'GET',
-    url: `http://localhost:5500/v1/time/month/${month.getFullYear()}-${pad(month.getMonth() + 1)}`,
+    url: `/v1/time/month/${month.getFullYear()}-${pad(month.getMonth() + 1)}`,
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+    },
     dataType: 'json',
     success: renderMonth
   })
@@ -243,8 +283,14 @@ window.onpopstate = function(event) {
 
 
 $(function() {
-  initCalendar();
-  initMonth(new Date())
+  $('#content').hide();
+  $('#login').hide();
+  initSession(() => {
+    $('#login').hide()
+    initCalendar();
+    initMonth(new Date())
+    $('#content').show();
+  })
   $('#edit').hide();
 })
 
@@ -252,8 +298,13 @@ $(function() {
 </head>
 <body>
 
-<div id = "edit">
+<div id = "edit"></div>
+<div id = "login">
+  Username: <input id = "username" /><br>
+  Password: <input id = "password" /><br>
+  <button id="loginButton">Login</button>
 </div>
+
 <div id ="content">
 <button id="previous"></button>
 <span id="current"></span>

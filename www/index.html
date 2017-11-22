@@ -18,8 +18,34 @@
     return `0${val}`.slice(-2)
   }
 
+  function initSession(setup) {
+    const token = localStorage.getItem('authtoken')
+    if (token) {
+      return setup()
+    }
+
+    $('#login').show()
+    $('#loginButton').click(() => {
+      $.ajax({
+        type: 'POST',
+        url: '/v1/authenticate',
+        data: JSON.stringify({
+          userid: $('#username').val(),
+          password: $('#password').val()
+        }),
+        contentType: 'application/json',
+        dataType: 'json',
+        success: res => {
+          console.log(res)
+          localStorage.setItem('authtoken', res.token)
+          initSession(setup)
+
+        }
+      })
+    })
+  }
+
   function checkPreviousDays(data) {
-    console.log(data)
     const warnings = []
     const now = new Date()
     Object.keys(data).forEach(day => {
@@ -35,7 +61,10 @@
     const month = new Date()
     $.ajax({
       type: 'GET',
-      url: `http://localhost:5500/v1/time/month/${month.getFullYear()}-${pad(month.getMonth() + 1)}`,
+      url: `/v1/time/month/${month.getFullYear()}-${pad(month.getMonth() + 1)}`,
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+      },
       dataType: 'json',
       success: checkPreviousDays
     })
@@ -43,59 +72,73 @@
   }
 
   $(document).ready(function() {
-  const d = new Date();
+    $('#content').hide()
+    initSession(() => {
+      const d = new Date();
+      $('#login').hide()
+      $('#content').show()
 
-  $('#date').val(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`)
-  $('#date').bootstrapMaterialDatePicker({ weekStart : 1, time: false });
+      $('#date').val(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`)
+      $('#date').bootstrapMaterialDatePicker({ weekStart : 1, time: false });
 
-  $('#time').val(`${pad(d.getHours())}:${pad(d.getMinutes())}`)
-  $('#time').bootstrapMaterialDatePicker({
-    nowButton: true,
-    date: false,
-    shortTime: false,
-    format: 'HH:mm'
-  })
+      $('#time').val(`${pad(d.getHours())}:${pad(d.getMinutes())}`)
+      $('#time').bootstrapMaterialDatePicker({
+        nowButton: true,
+        date: false,
+        shortTime: false,
+        format: 'HH:mm'
+      })
 
-  $.material.init()
+      $.material.init()
 
-  $('#save').click(function () {
-    const saveDate = new Date($('#date').val() + 'T' + $('#time').val() + ':00')
-    const newTime = {
-      timestamp: +saveDate,
-      shorttime: $('#time').val(),
-      year: saveDate.getFullYear(),
-      month: saveDate.getMonth() + 1,
-      day: saveDate.getDate()
-    }
+      $('#save').click(function () {
+        const saveDate = new Date($('#date').val() + 'T' + $('#time').val() + ':00')
+        const newTime = {
+          timestamp: +saveDate,
+          shorttime: $('#time').val(),
+          year: saveDate.getFullYear(),
+          month: saveDate.getMonth() + 1,
+          day: saveDate.getDate()
+        }
 
-    $.ajax({
-      type: 'POST',
-      url: 'http://localhost:5500/v1/time',
-      data: JSON.stringify(newTime),
-      contentType: 'application/json',
-      dataType: 'json',
-      success: res => {
-        console.log(res)
-      }
+        $.ajax({
+          type: 'POST',
+          url: '/v1/time',
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+          },
+          data: JSON.stringify(newTime),
+          contentType: 'application/json',
+          dataType: 'json',
+          success: res => {
+            console.log(res)
+          }
+        })
+        fetchCurrentMonth()
+      })
     })
-    fetchCurrentMonth();
   });
-
-});
 </script>
 </head>
 <body>
 <center>
-<div>
-<input type="text" id="date"  placeholder="Date">
-</div>
-<div>
-<input type="text" id="time"  placeholder="Time">
-</div>
-<div>
-<button id="save">Save</button>
-</div>
-<div id="feedback"></div>
+  <div id = "login">
+    Username: <input id = "username" /><br>
+    Password: <input id = "password" /><br>
+    <button id="loginButton">Login</button>
+  </div>
+  <div id = "content">
+    <div>
+      <input type="text" id="date"  placeholder="Date">
+    </div>
+    <div>
+      <input type="text" id="time"  placeholder="Time">
+    </div>
+    <div>
+      <button id="save">Save</button>
+    </div>
+    <div id="feedback"></div>
+  </div>
 </center>
 </body>
 </html>
