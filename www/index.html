@@ -14,6 +14,10 @@
 
   <script type="text/javascript" src="js/bootstrap-material-datetimepicker.js"></script>
 <script>
+  init() {
+    document.addEventListener("deviceready",deviceReady,false);
+  }
+
   function pad(val) {
     return `0${val}`.slice(-2)
   }
@@ -68,19 +72,20 @@
       dataType: 'json',
       success: checkPreviousDays
     })
+  }
+
+  function deviceReady() {
+    window.plugins.webintent.getUri(function(url) {
+        $('#feedback').html("INTENT URL: " + url);
+    })
+    window.plugins.webintent.onNewIntent(function(url) {
+        $('#feedback').html("INTENT URL: " + url);
+    })
 
   }
 
   $(document).ready(function() {
     $('#content').hide()
-    window.plugins.webintent.getUri(function(url) {
-        $('#feedback').text("INTENT URL: " + url);
-        $('#feedback').show();
-    })
-    window.plugins.webintent.onNewIntent(function(url) {
-        $('#feedback').text("INTENT URL: " + url);
-        $('#feedback').show();
-    })
 
     initSession(() => {
       const d = new Date();
@@ -129,7 +134,7 @@
   });
 </script>
 </head>
-<body>
+<body onload="init()">
 <center>
   <div id = "login">
     Username: <input id = "username" /><br>
