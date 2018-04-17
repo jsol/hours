@@ -18,6 +18,7 @@
     "express": "^4.16.2",
     "jsonwebtoken": "^8.1.0",
     "mysql": "^2.15.0",
+    "phonegap-plugin-barcodescanner": "^7.1.1",
     "standard": "^10.0.3",
     "uuid": "^3.1.0"
   },
@@ -28,7 +29,8 @@
   },
   "cordova": {
     "plugins": {
-      "com.borismus.webintent": {}
+      "com.borismus.webintent": {},
+      "phonegap-plugin-barcodescanner": {}
     }
   }
 }
