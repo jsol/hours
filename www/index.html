@@ -73,6 +73,15 @@
 
   $(document).ready(function() {
     $('#content').hide()
+    window.plugins.webintent.getUri(function(url) {
+        $('#feedback').text("INTENT URL: " + url);
+        $('#feedback').show();
+    })
+    window.plugins.webintent.onNewIntent(function(url) {
+        $('#feedback').text("INTENT URL: " + url);
+        $('#feedback').show();
+    })
+    $('#feedback').text('Uri:' + )
     initSession(() => {
       const d = new Date();
       $('#login').hide()

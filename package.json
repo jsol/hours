@@ -13,6 +13,7 @@
   "dependencies": {
     "argon2-ffi": "^1.0.1",
     "body-parser": "^1.18.2",
+    "cordova-webintent": "git+https://github.com/cordova-misc/cordova-webintent.git",
     "cors": "^2.8.4",
     "express": "^4.16.2",
     "jsonwebtoken": "^8.1.0",
@@ -24,5 +25,10 @@
     "ignore": [
       "/www/"
     ]
+  },
+  "cordova": {
+    "plugins": {
+      "com.borismus.webintent": {}
+    }
   }
 }
