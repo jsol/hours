@@ -6,16 +6,11 @@ const timeRouter = require('./timerouter')
 const userRouter = require('./userrouter')
 const path = require('path')
 const auth = require('./auth')
+const config = require('./config')
 
 const app = express()
 
-const dbPool = mysql.createPool({
-  connectionLimit: 10,
-  host: 'localhost',
-  user: 'root',
-  password: 'p',
-  database: 'hours'
-})
+const dbPool = mysql.createPool(config.get('mysql'))
 
 function nocache (req, res, next) {
   res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
@@ -28,10 +23,8 @@ app.use(cors())
 app.use(nocache)
 app.use(bodyparser.json())
 app.use('/v1/time', auth.auth, timeRouter(dbPool))
-app.use('/v1/user', auth.auth, userRouter(dbPool))
-
-app.post('/v1/authenticate', (req, res) => auth.authenticate(dbPool, req, res))
+app.use('/v1/user', userRouter(dbPool))
 
 app.use('/', express.static(path.join(__dirname, '../www')))
 
-app.listen(5500)
+app.listen(config.get('app.port'))

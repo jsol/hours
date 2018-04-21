@@ -1,0 +1,22 @@
+{
+  "short_name": "ArbetadTid",
+  "name": "Registrera arbetad tid",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "icons/48.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "icons/96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "icons/192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+<html>
+<head>
+<title>Hours report tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
+
+
+
+    <link rel="stylesheet"
+
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/css/bootstrap-material-design.min.css"/>
+
+    <link rel="stylesheet"
+
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/css/ripples.min.css"/>
+
+
+  <link rel="stylesheet" href="css/bootstrap-material-design.min.css"/>
+  <link rel="stylesheet" href="css/bootstrap-material-datetimepicker.css" />
+  <link rel="manifest" href="/manifest.json">
+
+  <link href="css/MaterialIcons.css" rel="stylesheet">
+
+  <script src="js/jquery-1.12.3.min.js"></script>
+
+  <script src="js/material.min.js"></script>
+
+  <script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+
+  <script type="text/javascript" src="js/bootstrap-material-datetimepicker.js"></script>
+<script>
+  const params = new URL(window.location.href).searchParams;
+  function pad(val) {
+    return `0${val}`.slice(-2)
+  }
+
+  function initSession(setup) {
+    const token = params.get('token') || localStorage.getItem('authtoken')
+  
+    if (token) {
+      localStorage.setItem('authtoken', token)
+      return setup()
+    }
+  }
+
+  function checkPreviousDays(data) {
+    const warnings = []
+    const now = new Date()
+    Object.keys(data).forEach(day => {
+      if(data[day].length % 2 && day < now.getDate()) {
+        warnings.push(`${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(day)} lacks stoptime`)
+      }
+    })
+    console.log(warnings)
+    $('#feedback').html(warnings.join('<br>'))
+  }
+
+  function fetchCurrentMonth() {
+    const month = new Date()
+    $.ajax({
+      type: 'GET',
+      url: `/v1/time/month/${month.getFullYear()}-${pad(month.getMonth() + 1)}`,
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+      },
+      dataType: 'json',
+      success: checkPreviousDays
+    })
+  }
+
+  $(document).ready(function() {
+    $('#content').hide()
+
+    initSession(() => {
+      $('#error').hide()
+      const d = new Date();
+      $('#content').show()
+
+      $('#date').val(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`)
+      $('#date').bootstrapMaterialDatePicker({ weekStart : 1, time: false });
+
+      $('#time').val(`${pad(d.getHours())}:${pad(d.getMinutes())}`)
+      $('#time').bootstrapMaterialDatePicker({
+        nowButton: true,
+        date: false,
+        shortTime: false,
+        format: 'HH:mm'
+      })
+
+      $.material.init()
+
+      $('#save').click(function () {
+        const saveDate = new Date($('#date').val() + 'T' + $('#time').val() + ':00')
+        const newTime = {
+          timestamp: +saveDate,
+          shorttime: $('#time').val(),
+          year: saveDate.getFullYear(),
+          month: saveDate.getMonth() + 1,
+          day: saveDate.getDate()
+        }
+
+        $.ajax({
+          type: 'POST',
+          url: '/v1/time',
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+          },
+          data: JSON.stringify(newTime),
+          contentType: 'application/json',
+          dataType: 'json',
+          success: res => {
+            console.log(res)
+          }
+        })
+        fetchCurrentMonth()
+      })
+    })
+  });
+</script>
+</head>
+<body>
+<center>
+  <div id = "content">
+    <div>
+      <input type="text" id="date"  placeholder="Date">
+    </div>
+    <div>
+      <input type="text" id="time"  placeholder="Time">
+    </div>
+    <div>
+      <button id="save">Save</button>
+    </div>
+    <div id="feedback"></div>
+  </div>
+</center>
+</body>
+</html>

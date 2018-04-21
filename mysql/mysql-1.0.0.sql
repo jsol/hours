@@ -15,7 +15,6 @@ CREATE table IF NOT EXISTS `times` (
 CREATE table IF NOT EXISTS `users` (
   `userid` varchar(256) NOT NULL,
   `timezone` bigint(20) NOT NULL,
-  `password` varchar(256) NOT NULL,
    PRIMARY KEY (`userid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
