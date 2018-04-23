@@ -1,0 +1,12 @@
+[Unit]
+Description=Worked hours daemon
+After=network.target mysql.service
+
+[Service]
+Type=simple
+User=hours
+ExecStart=/usr/local/hours --config /etc/hours.json
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

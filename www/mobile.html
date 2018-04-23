@@ -75,15 +75,16 @@
     initSession(token => {
       $('#error').hide()
       $('#content').show()
-
-      $email = $('#email')
-
-      $email.text(getEmail(token))
-      $welcome = $('#welcome')
-      while($email.width() < $welcome.width()) {
-        let fontSize = parseInt($email.css("font-size"));
-        fontSize = fontSize + 1 + "px";
-        $email.css({'font-size': fontSize});
+      const email = getEmail(token)
+      if (email) {
+        $email = $('#email')
+        $email.text(email)
+        $welcome = $('#welcome')
+        while($email.width() < $welcome.width()) {
+          let fontSize = parseInt($email.css("font-size"));
+          fontSize = fontSize + 1 + "px";
+          $email.css({'font-size': fontSize});
+        }
       }
 
       setToNow()
