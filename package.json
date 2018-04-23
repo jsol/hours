@@ -11,28 +11,21 @@
   "author": "Jens Olsson",
   "license": "MIT",
   "dependencies": {
-    "argon2-ffi": "^1.0.1",
     "body-parser": "^1.18.2",
     "convict": "^4.2.0",
-    "cordova-webintent": "git+https://github.com/cordova-misc/cordova-webintent.git",
     "cors": "^2.8.4",
     "emailjs": "^2.0.0",
     "express": "^4.16.2",
     "jsonwebtoken": "^8.1.0",
     "mysql": "^2.15.0",
-    "phonegap-plugin-barcodescanner": "^7.1.1",
-    "standard": "^10.0.3",
     "uuid": "^3.1.0"
+  },
+  "devDependencies": {
+    "standard": "^10.0.3"
   },
   "standard": {
     "ignore": [
-      "/www/"
+      "/www/js/"
     ]
-  },
-  "cordova": {
-    "plugins": {
-      "com.borismus.webintent": {},
-      "phonegap-plugin-barcodescanner": {}
-    }
   }
 }
