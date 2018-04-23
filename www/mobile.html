@@ -22,7 +22,6 @@
     const parts = token.split('.')
     const json = atob(parts[1])
     const info = JSON.parse(json)
-    return "jens@rootsy.nu"
     return info.email
   }
  
