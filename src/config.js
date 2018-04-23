@@ -15,6 +15,12 @@ try {
 
 try {
   config.validate({ allowed: 'strict' })
+  if (!config.get('email.from')) {
+    throw new Error('No email from address')
+  }
+  if (!config.get('email.subject')) {
+    throw new Error('No email subject')
+  }
 } catch (err) {
   throw new Error(`Error validating config file. Message: ${err.message}`)
 }
