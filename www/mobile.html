@@ -1,36 +1,31 @@
 <html>
 <head>
-<title>Hours report tool</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <title>Hours report tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/css/bootstrap-material-design.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/css/ripples.min.css"/>
+    <link rel="stylesheet" href="css/bootstrap-material-datetimepicker.css" />
+    <link href="css/MaterialIcons.css" rel="stylesheet">
+    <link href="css/mobile.css" rel="stylesheet">
 
+    <link rel="manifest" href="/manifest.json">
 
-
-    <link rel="stylesheet"
-
-        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/css/bootstrap-material-design.min.css"/>
-
-    <link rel="stylesheet"
-
-        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/css/ripples.min.css"/>
-
-
-  <link rel="stylesheet" href="css/bootstrap-material-design.min.css"/>
-  <link rel="stylesheet" href="css/bootstrap-material-datetimepicker.css" />
-  <link rel="manifest" href="/manifest.json">
-
-  <link href="css/MaterialIcons.css" rel="stylesheet">
-
-  <script src="js/jquery-1.12.3.min.js"></script>
-
-  <script src="js/material.min.js"></script>
-
-  <script type="text/javascript" src="js/moment-with-locales.min.js"></script>
-
-  <script type="text/javascript" src="js/bootstrap-material-datetimepicker.js"></script>
+    <script src="js/jquery-1.12.3.min.js"></script>
+    <script src="js/material.min.js"></script>
+    <script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-material-datetimepicker.js"></script>
 <script>
   const params = new URL(window.location.href).searchParams;
+
+  function getEmail(token) {
+    const parts = token.split('.')
+    const json = atob(parts[1])
+    const info = JSON.parse(json)
+    return "jens@rootsy.nu"
+    return info.email
+  }
+ 
   function pad(val) {
     return `0${val}`.slice(-2)
   }
@@ -40,7 +35,7 @@
   
     if (token) {
       localStorage.setItem('authtoken', token)
-      return setup()
+      return setup(token)
     }
   }
 
@@ -69,26 +64,43 @@
     })
   }
 
+  function setToNow() {
+    const d = new Date();
+    $('#date').val(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`)
+    $('#time').val(`${pad(d.getHours())}:${pad(d.getMinutes())}`)
+  }
+
   $(document).ready(function() {
     $('#content').hide()
 
-    initSession(() => {
+    initSession(token => {
       $('#error').hide()
-      const d = new Date();
       $('#content').show()
 
-      $('#date').val(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`)
+      $email = $('#email')
+
+      $email.text(getEmail(token))
+      $welcome = $('#welcome')
+      while($email.width() < $welcome.width()) {
+        let fontSize = parseInt($email.css("font-size"));
+        fontSize = fontSize + 1 + "px";
+        $email.css({'font-size': fontSize});
+      }
+
+      setToNow()
+
       $('#date').bootstrapMaterialDatePicker({ weekStart : 1, time: false });
 
-      $('#time').val(`${pad(d.getHours())}:${pad(d.getMinutes())}`)
       $('#time').bootstrapMaterialDatePicker({
-        nowButton: true,
+        nowButton: false,
         date: false,
         shortTime: false,
         format: 'HH:mm'
       })
 
       $.material.init()
+
+      $('#now').click(setToNow)
 
       $('#save').click(function () {
         const saveDate = new Date($('#date').val() + 'T' + $('#time').val() + ':00')
@@ -110,7 +122,14 @@
           contentType: 'application/json',
           dataType: 'json',
           success: res => {
-            console.log(res)
+            $('#feedback').text('Time saved')
+            $('#feedback').removeClass('failed')
+            $('#feedback').addClass('ok')
+          },
+          error: () => {
+            $('#feedback').text('Could not save the time')
+            $('#feedback').addClass('failed')
+            $('#feedback').removeClass('ok')
           }
         })
         fetchCurrentMonth()
@@ -122,15 +141,16 @@
 <body>
 <center>
   <div id = "content">
-    <div>
+<div>
+    <span id = "welcome">Welcome, add a new time for account</span><br>
+    <span id = "email"></span>
+</div>
+<div>
       <input type="text" id="date"  placeholder="Date">
-    </div>
-    <div>
       <input type="text" id="time"  placeholder="Time">
-    </div>
-    <div>
+      <button id="now">Set to now</button>
       <button id="save">Save</button>
-    </div>
+</div>
     <div id="feedback"></div>
   </div>
 </center>

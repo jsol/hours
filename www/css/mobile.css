@@ -1,0 +1,30 @@
+#content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#content input {
+  text-align: center;
+  font-size: 36px;
+  margin-top: 10%;
+  height: 10%;
+  width: 100%
+}
+
+#content button {
+  margin-top: 10%;
+  font-size: 20px;
+  height: 10%;
+  width: 100%
+}
+
+.ok {
+  font-size: 20px;
+  color: rgb(20, 240, 20);
+}
+.failed {
+  font-size: 20px;
+  color: rgb(240, 20, 20);
+}
