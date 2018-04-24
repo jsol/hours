@@ -148,6 +148,40 @@ function renderEditFrame(day, month, data) {
   $edit.empty()
 
   $edit.append($('<h3>').text(`Edit day ${month.getFullYear()}-${pad(month.getMonth() + 1)}-${pad(day)}`))
+  $holiday = $('<select><option value="">Ordinary day<option value="half">Half day<option value="full">Holiday</select>')
+  $holiday.change(() => {
+    const type = $holiday.val()
+    if (type === '') {
+      $.ajax({
+        type: 'DELETE',
+        url: `/v1/holiday/day/${month.getFullYear()}-${pad(month.getMonth() + 1)}-${pad(day)}`,
+        contentType: 'application/json',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+        }
+      })
+    } else {
+      const item = {
+        type: type,
+        day: pad(day),
+        month: pad(month.getMonth() + 1),
+        year: month.getFullYear()
+      }
+      $.ajax({
+        type: 'POST',
+        url: `/v1/holiday`,
+        data: JSON.stringify(item),
+        contentType: 'application/json',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+        },
+        dataType: 'json'
+      })
+    }
+  })
+
+  $edit.append($holiday);
+
   data.forEach(time => {
     const $t = $('<div>').text(time.shorttime).append($('<button>').text('Delete').click(() => {
       $.ajax({
@@ -224,40 +258,6 @@ function renderEditFrame(day, month, data) {
     $('#content').show()
   })
 
-  $holiday = $('<select><option value="">Ordinary day<option value="half">Half day<option value="full">Holiday</select>')
-  $holiday.change(() => {
-    const type = $holiday.val()
-    if (type === '') {
-      $.ajax({
-        type: 'DELETE',
-        url: `/v1/holiday/day/${month.getFullYear()}-${pad(month.getMonth() + 1)}-${pad(day)}`,
-        contentType: 'application/json',
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
-        }
-      })
-    } else {
-      const item = {
-        type: type,
-        day: pad(day),
-        month: pad(month.getMonth() + 1),
-        year: month.getFullYear()
-      }
-      $.ajax({
-        type: 'POST',
-        url: `/v1/holiday`,
-        data: JSON.stringify(item),
-        contentType: 'application/json',
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
-        },
-        dataType: 'json'
-      })
-    }
-  })
-
-  $edit.append($holiday);
-  $edit.append('<br>');
   $edit.append($ok)
   $.ajax({
     type: 'GET',
@@ -356,6 +356,7 @@ function initMonth(month) {
   const firstDay = new Date(month.getFullYear(), month.getMonth(), 1).getDay() || 7;
   const numOfDays = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate()
   $('#edit').hide()
+  $('#import').hide()
   $('#content').show()
 
   $('#calendar .week').remove();
@@ -432,6 +433,10 @@ window.onpopstate = function(event) {
       initMonth(event.state.month)
       return
     }
+    if (event.state.import) {
+      renderImportFrame();
+      return
+    }
   }
   initMonth(new Date())
 }
@@ -447,7 +452,12 @@ $(function() {
   })
   $('#edit').hide();
   $('#import').hide();
-  $('#showImport').click(renderImportFrame)
+  $('#showImport').click(() => {
+    window.history.pushState({
+      import: true
+    }, 'Import holidays')
+    renderImportFrame()
+  })
 
 })
 

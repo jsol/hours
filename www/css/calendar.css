@@ -83,6 +83,24 @@ button {
     cursor: pointer;
 }
 
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  display: inline-block;
+  background: #8f7a66;
+  border-radius: 3px;
+  padding: 0 20px;
+  text-decoration: none;
+  color: #f9f6f2;
+  cursor: pointer;
+  height: 20px;
+  line-height: 21px;
+margin-bottom: 10px;
+}
 
 .holiday-full {
   background: #f65e3b42 !important;
