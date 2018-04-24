@@ -47,14 +47,26 @@ module.exports = () => {
 
     const token = auth.createToken(email)
     const htmlmessage = `<html>
-      i <i>hope</i> this works!
+To get an overview over times you have registered visit      
 <p><a href="${config.get('app.url')}/desktop.html?token=${token}">Desktop</a></p>
+
+Open this site in your phone to add times the easy way:
 <p><a href="${config.get('app.url')}/mobile.html?token=${token}">Mobile</a></p>
+Use "Add To Homescreen" to make the application behave more like a native app.
+<p>Both links will remember the token for later visits so it is no longer needed
+after the first visit.
 </html>`
-    const plainmessage = `i hope this works!
+
+    const plainmessage = `To get an overview over times you have registered visit 
 Desktop: ${config.get('app.url')}/desktop.html?token=${token}
 
-Mobile: ${config.get('app.url')}/mobile.html?token=${token}`
+Open this site in your phone to add times the easy way:
+Mobile: ${config.get('app.url')}/mobile.html?token=${token}
+
+Both links will remember the token for later visits so it is no longer needed
+after the first visit.
+
+Use "Add To Homescreen" to make the application behave more like a native app.`
 
     server.send({
       text: plainmessage,
@@ -70,7 +82,7 @@ Mobile: ${config.get('app.url')}/mobile.html?token=${token}`
       if (err) {
         return res.status(400).end()
       } else {
-        return res.status(200).end()
+        return res.status(200).json({ email: 'ok' }).end()
       }
     })
   })

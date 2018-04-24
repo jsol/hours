@@ -5,8 +5,6 @@ const config = require('./config')
 const jwtsecret = config.get('jwtsecret')
 
 function auth (req, res, next) {
-  console.log(req.headers.authorization)
-
   let token = false
 
   if (req.query.token) {
@@ -29,7 +27,6 @@ function auth (req, res, next) {
       return
     }
     req.user = decoded.userid
-    console.log('tmptoken', decoded)
 
     if (decoded.tokenid) {
       res.status(400).end()

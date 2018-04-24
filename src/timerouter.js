@@ -60,7 +60,6 @@ module.exports = db => {
   })
 
   time.get('/:id', (req, res) => {
-    console.log(req.params)
     res.end()
   })
 
