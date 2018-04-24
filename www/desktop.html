@@ -25,6 +25,120 @@ function initCalendar() {
   }
 }
 
+function renderImportFrame() {
+  const $import = $('#import')
+  $import.empty();
+  $textarea = $('<textarea></textarea>')
+
+  $textarea.val(`Enter the days that should be imported here, according to this pattern:
+YYYY/MM/DD (whatever characters y like, or none) "half" or "full" keyword.
+The parsing is sase insensitive and any line that doesnt match YYYY/MM/DD*.full|half*. is ignored.
+
+By an extraordinary coincidence this is the format you get if you copy-past from Axis intraweb
+(search for Public Holidays). Example for 2018:
+
+2018/01/01	Full day
+2018/01/05	Half day
+2018/01/06	Full day
+2018/03/29	Half day
+2018/03/30	Full day
+2018/03/31	Full day
+2018/04/01	Full day
+2018/04/02	Full day
+(there can be garbage in the middle of this, no problem)
+2018/04/30	Full day
+2018/05/01	Full day
+2018/05/09	Half day
+2018/05/10	Full day
+XX 2018/05/11	Full day (or maybe stuff before or after)
+2018/06/05	Half day
+2018/06/06	Full day
+2018/06/22	Full day
+2018/11/02	Half day
+2018/11/03	Full day
+2018/12/24	Full day
+2018/12/25	Full day
+2018/12/26	Full day
+2018/12/31	Full day
+
+(You can just push "import" to add theses days, all the extra text will be ignored).
+  `)
+  $save = $('<button></button>').text('Import')
+
+  $save.click(() => {
+    const rows = $textarea.val().split('\n')
+
+    const halfReg = new RegExp('([0-9]{4})\/([0-9]{2})\/([0-9]{2}).*half.*', 'i')
+    const fullReg = new RegExp('([0-9]{4})\/([0-9]{2})\/([0-9]{2}).*full.*', 'i')
+
+    const days = []
+
+    rows.forEach(row => {
+
+      let type = 'half'
+      let res = row.match(halfReg)
+
+
+      if (!res)  {
+        type = 'full'
+        res = row.match(fullReg)
+      }
+
+      if (!res) {
+        return
+      }
+
+      days.push({
+        year: res[1],
+        month: res[2],
+        day: res[3],
+        type: type
+      })
+    })
+
+    console.log(days)
+    $('#content').show()
+    $import.hide()
+    $.ajax({
+      type: 'POST',
+      url: '/v1/holiday/import',
+      data: JSON.stringify(days),
+      contentType: 'application/json',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+      },
+      dataType: 'json',
+      success: res => {
+        renderHolidays()
+      }
+    })
+
+  })
+  $import.append($textarea)
+  $import.append($save)
+  $('#content').hide()
+  $import.show()
+}
+
+function renderHolidays() {
+  const month = $('#current').data('code')
+  $.ajax({
+    type: 'GET',
+    url: `/v1/holiday/month/${month}`,
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+    },
+    dataType: 'json',
+    success: data => {
+      $('.day').removeClass('holiday-full')
+      $('.day').removeClass('holiday-half')
+      Object.keys(data).forEach(key => {
+        $('#day' + key).addClass('holiday-' + data[key].type)
+      })
+    }
+  })
+}
+
 function pad(val) {
   return `0${val}`.slice(-2)
 }
@@ -64,8 +178,6 @@ function renderEditFrame(day, month, data) {
     if (inString.match(/^[0-2][0-9]:[0-6][0-9]$/)) {
       time = inString.split(':')
     }
-
-    console.log(time);
 
     if (time === false) {
       console.log('Bad input')
@@ -107,11 +219,59 @@ function renderEditFrame(day, month, data) {
   $ok = $('<button>').text('Done').attr('id', 'doneEdit')
   $ok.click(() => {
     renderDay(day, data)
-    $edit.hide();
+    $edit.hide()
+    renderHolidays()
     $('#content').show()
   })
 
+  $holiday = $('<select><option value="">Ordinary day<option value="half">Half day<option value="full">Holiday</select>')
+  $holiday.change(() => {
+    const type = $holiday.val()
+    if (type === '') {
+      $.ajax({
+        type: 'DELETE',
+        url: `/v1/holiday/day/${month.getFullYear()}-${pad(month.getMonth() + 1)}-${pad(day)}`,
+        contentType: 'application/json',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+        }
+      })
+    } else {
+      const item = {
+        type: type,
+        day: pad(day),
+        month: pad(month.getMonth() + 1),
+        year: month.getFullYear()
+      }
+      $.ajax({
+        type: 'POST',
+        url: `/v1/holiday`,
+        data: JSON.stringify(item),
+        contentType: 'application/json',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+        },
+        dataType: 'json'
+      })
+    }
+  })
+
+  $edit.append($holiday);
+  $edit.append('<br>');
   $edit.append($ok)
+  $.ajax({
+    type: 'GET',
+    url: `/v1/holiday/day/${month.getFullYear()}-${pad(month.getMonth() + 1)}-${pad(day)}`,
+    contentType: 'application/json',
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('authtoken'),
+    },
+    success: day => {
+      if (day) {
+        $holiday.val(day.type)
+      }
+    }
+  })
   $edit.show()
   $('#content').hide()
 }
@@ -128,7 +288,6 @@ function editDay(day, month) {
       renderEditFrame(day, month, data)
     }
   })
-
 }
 
 function renderDay(day, data) {
@@ -237,6 +396,8 @@ function initMonth(month) {
   $('#previous').text(monthnames[month.getMonth() ? month.getMonth() - 1 : 11])
   $('#next').text(monthnames[(month.getMonth() + 1) % 12])
 
+  $('#current').data('code', `${month.getFullYear()}-${pad(month.getMonth() + 1)}`)
+
   $('#previous').off('click')
   $('#next').off('click')
 
@@ -256,6 +417,7 @@ function initMonth(month) {
   })
 
   fetchMonth(month)
+  renderHolidays()
 }
 
 
@@ -284,6 +446,9 @@ $(function() {
     $('#content').show();
   })
   $('#edit').hide();
+  $('#import').hide();
+  $('#showImport').click(renderImportFrame)
+
 })
 
 </script>
@@ -299,8 +464,10 @@ $(function() {
 <table id="calendar" border=1>
 <tr id="header">
 </tr>
-
 </table>
+<button id="showImport">Import holidays</button>
 </div>
+
+<div id ="import"></div>
 </body>
 </html>

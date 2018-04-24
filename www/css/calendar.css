@@ -83,6 +83,26 @@ button {
     cursor: pointer;
 }
 
+
+.holiday-full {
+  background: #f65e3b42 !important;
+}
+
+.holiday-half {
+  background: repeating-linear-gradient(
+    45deg,
+    #faf8ef,
+    #faf8ef 10px,
+    #f65e3b42 10px,
+    #f65e3b42 20px
+  ) !important;
+}
+
+textarea {
+  width: 72em;
+  height: 50em;
+}
+
 h3 {
   font-size: 36px;
 }

@@ -12,6 +12,20 @@ CREATE table IF NOT EXISTS `times` (
    KEY `month` (`month`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+CREATE table IF NOT EXISTS `holidays` (
+  `uuid` varchar(256) NOT NULL,
+  `userid` varchar(256) NOT NULL,
+  `type` varchar(256) NOT NULL,
+  `year` int(10) unsigned NOT NULL,
+  `month` int(10) unsigned NOT NULL,
+  `day` int(10) unsigned NOT NULL,
+   PRIMARY KEY (`uuid`),
+   KEY `userid` (`userid`),
+   KEY `year` (`year`),
+   KEY `month` (`month`),
+   UNIQUE (`userid`, `year`, `month`, `day`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 CREATE table IF NOT EXISTS `users` (
   `userid` varchar(256) NOT NULL,
   `timezone` bigint(20) NOT NULL,

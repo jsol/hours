@@ -27,7 +27,7 @@ module.exports = () => {
 
   setInterval(() => {
     blacklists.email = {}
-  }, 24* 60 * 60 * 1000)
+  }, 24 * 60 * 60 * 1000)
 
   user.post('/sendToken', (req, res) => {
     const email = req.body.email
