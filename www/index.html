@@ -1,10 +1,7 @@
 <html>
 <head>
 <title>Hours report tool</title>
-  <link rel="stylesheet" href="css/bootstrap-material-design.min.css"/>
-  <link rel="stylesheet" href="css/bootstrap-material-datetimepicker.css" />
-
-  <link href="css/MaterialIcons.css" rel="stylesheet">
+  <link href="css/start.css" rel="stylesheet">
 
   <script src="js/jquery-1.12.3.min.js"></script>
 <script>
@@ -17,7 +14,22 @@
         contentType: 'application/json',
         dataType: 'json',
         success: res => {
-          console.log(res)
+          $feedback = $('#feedback')
+          $feedback.text(`Credentials sent to ${$('#email').val()}`)
+          $feedback.removeClass('failed')
+          $feedback.addClass('ok')
+          $feedback.show()
+          $feedback.fadeOut(5000)
+          console.log('saved')
+        },
+        error: () => {
+          $feedback = $('#feedback')
+          $feedback.text(`Could not send credentials to ${$('#email').val()}`)
+          $feedback.addClass('failed')
+          $feedback.removeClass('ok')
+          $feedback.show()
+          $feedback.fadeOut(10000)
+          console.log('failed to save')
         }
       })
     })
@@ -28,10 +40,19 @@
 <center>
   <div id = "content">
     <div>
-      <p>Welcome.
-      <br>Enter an email to receive corresponding login information</p>
+      <h1>Welcome</h1>
+      <div id = "explanation">
+      This is a tool for keeping track of time worked. It stores your email
+      address in a special token, and uses a hash of that email to keep track
+      of the times you add. The general idea is to use a simple mobile webapp to
+      add times and then use a desktop page to make sense of these times when it is
+      time to make a proper time report.
+      <p>The code is available at <a href="https://github.com/jsol/hours">Github</a>.</p>
+      <p>Enter an email to receive links to add times associated with that email</p>
+      </div>
       <p><input type="text" id="email"></p>
       <p><button id="send">Send login</button></p>
+      (Note: Your email is not saved in the server, just a hash of it)
     </div>
     <div id="feedback"></div>
   </div>

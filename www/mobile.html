@@ -24,14 +24,13 @@
     const info = JSON.parse(json)
     return info.email
   }
- 
+
   function pad(val) {
     return `0${val}`.slice(-2)
   }
 
   function initSession(setup) {
     const token = params.get('token') || localStorage.getItem('authtoken')
-  
     if (token) {
       localStorage.setItem('authtoken', token)
       return setup(token)
@@ -122,14 +121,22 @@
           contentType: 'application/json',
           dataType: 'json',
           success: res => {
-            $('#feedback').text('Time saved')
-            $('#feedback').removeClass('failed')
-            $('#feedback').addClass('ok')
+            $feedback = $('#feedback')
+            $feedback.text('Time saved')
+            $feedback.removeClass('failed')
+            $feedback.addClass('ok')
+            $feedback.show()
+            $feedback.fadeOut(5000)
+            console.log('saved')
           },
           error: () => {
-            $('#feedback').text('Could not save the time')
-            $('#feedback').addClass('failed')
-            $('#feedback').removeClass('ok')
+            $feedback = $('#feedback')
+            $feedback.text('Could not save the time')
+            $feedback.addClass('failed')
+            $feedback.removeClass('ok')
+            $feedback.show()
+            $feedback.fadeOut(10000)
+            console.log('failed to save')
           }
         })
         fetchCurrentMonth()
