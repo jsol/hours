@@ -12,7 +12,7 @@ const workingHours = 8
 function initSession(setup) {
 console.log(params)
   const token = params.get('token') || localStorage.getItem('authtoken')
-  
+
   if (token) {
     localStorage.setItem('authtoken', token)
     return setup()
@@ -55,15 +55,27 @@ function renderEditFrame(day, month, data) {
     $(this).val('')
   })).append($('<button>').text('Add').prop('id', 'addButton').click(() => {
     const inString = $('#newTime').val()
-    if (!inString.match(/^[0-2][0-9]:[0-6][0-9]$/)) {
+    let time = false
+
+    if (inString.match(/^[0-2][0-9][0-6][0-9]$/)) {
+      time = [inString.substring(0, 2), inString.substring(2, 4)]
+    }
+
+    if (inString.match(/^[0-2][0-9]:[0-6][0-9]$/)) {
+      time = inString.split(':')
+    }
+
+    console.log(time);
+
+    if (time === false) {
       console.log('Bad input')
       return;
     }
-    const time = inString.split(':')
+
     const saveDate = new Date(month.getFullYear(), month.getMonth(), day, ...time, 0)
     const newTime = {
       timestamp: +saveDate,
-      shorttime: $('#newTime').val(),
+      shorttime: `${time[0]}:${time[1]}`,
       year: saveDate.getFullYear(),
       month: saveDate.getMonth() + 1,
       day: saveDate.getDate()
@@ -92,8 +104,7 @@ function renderEditFrame(day, month, data) {
     }
   });
 
-
-  $ok = $('<button>').text('Done')
+  $ok = $('<button>').text('Done').attr('id', 'doneEdit')
   $ok.click(() => {
     renderDay(day, data)
     $edit.hide();

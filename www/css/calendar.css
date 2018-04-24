@@ -1,31 +1,35 @@
 #content {
   display: table;
   position: relative;
-  border: 1px solid black;
+  font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
 }
+
 #current {
   display: table;
-margin: 0 auto;
-margin-bottom: 10px;
+  margin: 0 auto;
+  margin-bottom: 10px;
+  font-size: 36px;
 }
 
 #previous {
   text-align: left;
-position: absolute;
-left: 0px;
-top: 0px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
 }
 
 #next {
-position: absolute;
-right: 0px;
-top: 0px;
+  position: absolute;
+  right: 0px;
+  top: 0px;
 }
 
 #calendar {
   display: table;
-margin: 0 auto;
-margin-bottom: 10px;
+  margin: 0 auto;
+  border: 1px solid black;
+  border-spacing: 0px;
+  font-size: 18px;
 }
 
 .week {
@@ -34,15 +38,70 @@ margin-bottom: 10px;
 
 .day {
   min-width: 100px;
+  padding: 10px;
 }
 
 .number {
   text-align: right;
   width: 100%;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.weekend {
+  background: #ede0c8;
+}
+
+.inactive {
+  background: #bbada0;
 }
 
 .flex {
   font-weight: bold;
+  font-size: 20px;
+}
 
 body {
+  background: #faf8ef;
+}
+
+button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+    display: inline-block;
+    background: #8f7a66;
+    border-radius: 3px;
+    padding: 0 20px;
+    text-decoration: none;
+    color: #f9f6f2;
+    height: 40px;
+    line-height: 42px;
+    cursor: pointer;
+}
+
+h3 {
+  font-size: 36px;
+}
+
+#edit div {
+  margin-top: 15px;
+}
+
+#edit button {
+  height: 20px;
+  line-height: 21px;
+  margin-left: 10px;
+}
+
+input {
+  width: 5em;
+}
+
+#doneEdit {
+  margin-left: 0px !important;
+  margin-top: 20px;
 }
