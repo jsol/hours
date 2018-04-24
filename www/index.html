@@ -22,9 +22,13 @@
           $feedback.fadeOut(5000)
           console.log('saved')
         },
-        error: () => {
+        error: (err) => {
           $feedback = $('#feedback')
-          $feedback.text(`Could not send credentials to ${$('#email').val()}`)
+          if (err.status === 429) {
+            $feedback.text('Credentials will only be sent once per 24 hours per email, and only once per minute per IP, to prevent spamming. Please try again later.')
+          } else {
+            $feedback.text(`Could not send credentials to ${$('#email').val()}`)
+          }
           $feedback.addClass('failed')
           $feedback.removeClass('ok')
           $feedback.show()
