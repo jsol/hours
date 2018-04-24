@@ -6,6 +6,10 @@
   <script src="js/jquery-1.12.3.min.js"></script>
 <script>
   $(document).ready(function() {
+    if (localStorage.getItem('authtoken')) {
+      $('#existing').show()
+    }
+
     $('#send').click(function () {
       $.ajax({
         type: 'POST',
@@ -45,6 +49,9 @@
   <div id = "content">
     <div>
       <h1>Welcome</h1>
+      <div id="existing">It seems like you have already registerd an email. 
+      Use the  <a href="desktop.html">desktop site</a> for an overview or
+      the <a href="mobile.html">mobile site</a> to quickly add times.</div>
       <div id = "explanation">
       This is a tool for keeping track of time worked. It stores your email
       address in a special token, and uses a hash of that email to keep track
@@ -53,6 +60,8 @@
       time to make a proper time report.
       <p>The code is available at <a href="https://github.com/jsol/hours">Github</a>.</p>
       <p>Enter an email to receive links to add times associated with that email</p>
+      <p>Since this is an automated email sender there is quite a big chance that it
+         gets caught in the spam folder so dont forget to check it.</p>
       </div>
       <p><input type="text" id="email"></p>
       <p><button id="send">Send login</button></p>
