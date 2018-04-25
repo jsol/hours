@@ -1,6 +1,6 @@
 {
-  "short_name": "ArbetadTid",
-  "name": "Registrera arbetad tid",
+  "short_name": "WorkedTime",
+  "name": "Register worked time",
   "display": "standalone",
   "icons": [
     {
