@@ -24,6 +24,7 @@
     <script type="text/javascript" src="js/bootstrap-material-datetimepicker.js"></script>
 <script>
   const params = new URL(window.location.href).searchParams;
+  window.onfocus = setToNow
 
   function getEmail(token) {
     const parts = token.split('.')
