@@ -47,21 +47,21 @@ module.exports = () => {
 
     const token = auth.createToken(email)
     const htmlmessage = `<html>
-To get an overview over times you have registered visit      
-<p><a href="${config.get('app.url')}/desktop.html?token=${token}">Desktop</a></p>
+To get an overview over times you have registered visit
+<p><a href="${config.get('app.url')}/desktop_init.html#${token}">Desktop</a></p>
 
 Open this site in your phone to add times the easy way:
-<p><a href="${config.get('app.url')}/mobile.html?token=${token}">Mobile</a></p>
+<p><a href="${config.get('app.url')}/mobile_init.html#${token}">Mobile</a></p>
 Use "Add To Homescreen" to make the application behave more like a native app.
 <p>Both links will remember the token for later visits so it is no longer needed
 after the first visit.
 </html>`
 
     const plainmessage = `To get an overview over times you have registered visit 
-Desktop: ${config.get('app.url')}/desktop.html?token=${token}
+Desktop: ${config.get('app.url')}/desktop_init.html#${token}
 
 Open this site in your phone to add times the easy way:
-Mobile: ${config.get('app.url')}/mobile.html?token=${token}
+Mobile: ${config.get('app.url')}/mobile_init.html#${token}
 
 Both links will remember the token for later visits so it is no longer needed
 after the first visit.
@@ -86,5 +86,10 @@ Use "Add To Homescreen" to make the application behave more like a native app.`
       }
     })
   })
+
+  user.get('/verify', (req, res) => {
+    res.json({ status: 'ok' }).status(200).end()
+  })
+
   return user
 }

@@ -23,7 +23,6 @@
     <script type="text/javascript" src="js/moment-with-locales.min.js"></script>
     <script type="text/javascript" src="js/bootstrap-material-datetimepicker.js"></script>
 <script>
-  const params = new URL(window.location.href).searchParams;
   window.onfocus = setToNow
 
   function getEmail(token) {
@@ -38,9 +37,8 @@
   }
 
   function initSession(setup) {
-    const token = params.get('token') || localStorage.getItem('authtoken')
+    const token = localStorage.getItem('authtoken')
     if (token) {
-      localStorage.setItem('authtoken', token)
       return setup(token)
     }
   }

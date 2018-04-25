@@ -10,17 +10,15 @@
   <link rel="stylesheet" href="css/calendar.css" />
   <script src="js/jquery-1.12.3.min.js"></script>
 <script>
-const params = new URL(window.location.href).searchParams;
+
 const daynames = ['Sun', 'Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
 const monthnames = ['January', 'February', 'Mars', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 const workingHours = 8
 
 function initSession(setup) {
-console.log(params)
-  const token = params.get('token') || localStorage.getItem('authtoken')
+  const token = localStorage.getItem('authtoken')
 
   if (token) {
-    localStorage.setItem('authtoken', token)
     return setup()
   }
 }
@@ -120,8 +118,17 @@ XX 2018/05/11	Full day (or maybe stuff before or after)
     })
 
   })
+
+  $cancel = $('<button></button>').text('Cancel')
+  $cancel.click(() => {
+    $import.hide()
+    $('#content').show()
+  })
+
   $import.append($textarea)
+  $import.append('<br>')
   $import.append($save)
+  $import.append($cancel)
   $('#content').hide()
   $import.show()
 }
