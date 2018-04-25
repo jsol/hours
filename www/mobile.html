@@ -130,6 +130,8 @@
       $('#now').click(setToNow)
 
       $('#save').click(function () {
+        const $button = $(this)
+        $button.prop("disabled",true)
         const saveDate = new Date($('#date').val() + 'T' + $('#time').val() + ':00')
         const newTime = {
           timestamp: +saveDate,
@@ -149,9 +151,11 @@
           contentType: 'application/json',
           dataType: 'json',
           success: res => {
+            $button.prop("disabled", false)
             feedback('ok', 'Time saved')
           },
           error: err => {
+            $button.prop("disabled", false)
             feedback('error', 'Could not save the time')
             console.log(err)
           }
