@@ -30,11 +30,15 @@
   cursor: pointer;
 }
 
-.ok {
+.feedback-ok {
   font-size: 48px;
   color: rgb(20, 240, 20);
 }
-.failed {
+.feedback-error {
   font-size: 48px;
   color: rgb(240, 20, 20);
+}
+.feedback-warn {
+  font-size: 48px;
+  color: rgb(200, 200, 20);
 }

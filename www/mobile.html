@@ -43,6 +43,28 @@
     }
   }
 
+  function feedback(level, message) {
+    let fade = 0
+    switch (level) {
+      case 'warn':
+      case 'error':
+        fade = 10000
+        break
+      case 'ok': 
+        fade = 5000
+        break
+      default:
+        console.log('Not recognized log level')
+        return
+    }
+
+    $feedback = $('<div></div>')
+    $feedback.text(message)
+    $feedback.addClass('feedback-' +level)
+    $('#feedback').append($feedback)
+    $feedback.fadeOut(fade)
+  }
+
   function checkPreviousDays(data) {
     const warnings = []
     const now = new Date()
@@ -52,7 +74,7 @@
       }
     })
     console.log(warnings)
-    $('#feedback').html(warnings.join('<br>'))
+    feedback('warn', warnings.join('\n'))
   }
 
   function fetchCurrentMonth() {
@@ -127,22 +149,11 @@
           contentType: 'application/json',
           dataType: 'json',
           success: res => {
-            $feedback = $('#feedback')
-            $feedback.text('Time saved')
-            $feedback.removeClass('failed')
-            $feedback.addClass('ok')
-            $feedback.show()
-            $feedback.fadeOut(5000)
-            console.log('saved')
+            feedback('ok', 'Time saved')
           },
-          error: () => {
-            $feedback = $('#feedback')
-            $feedback.text('Could not save the time')
-            $feedback.addClass('failed')
-            $feedback.removeClass('ok')
-            $feedback.show()
-            $feedback.fadeOut(10000)
-            console.log('failed to save')
+          error: err => {
+            feedback('error', 'Could not save the time')
+            console.log(err)
           }
         })
         fetchCurrentMonth()
