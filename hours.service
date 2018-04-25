@@ -5,7 +5,7 @@ After=network.target mysql.service
 [Service]
 Type=simple
 User=hours
-ExecStart=/usr/local/hours --config /etc/hours.json
+ExecStart=/usr/local/bin/hours --config /etc/hours.json
 Restart=on-failure
 
 [Install]
