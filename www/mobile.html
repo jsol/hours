@@ -151,11 +151,15 @@
           contentType: 'application/json',
           dataType: 'json',
           success: res => {
-            $button.prop("disabled", false)
+            setTimeout(() => {
+              $button.prop("disabled", false)
+            }, 1000)
             feedback('ok', 'Time saved')
           },
           error: err => {
-            $button.prop("disabled", false)
+            setTimeout(() => {
+              $button.prop("disabled", false)
+            }, 1000)
             feedback('error', 'Could not save the time')
             console.log(err)
           }
